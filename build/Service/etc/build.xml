@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+
+<project name="ServiceWar" default="refresh" basedir=".">
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                           M a i n                           *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Rebuild and redeploy project -->
+    <target name="refresh">
+        <antcall target="rebuild"/>
+        <antcall target="redeploy"/>
+    </target>
+
+    <!-- Rebuild project -->
+    <target name="rebuild">
+        <antcall target="build.clean"/>
+        <antcall target="build"/>
+    </target>
+
+    <!-- Build project -->
+    <target name="build">
+        <antcall target="package.project"/>
+    </target>
+
+    <!-- Redeploy project -->
+    <target name="redeploy">
+        <antcall target="deploy.clean"/>
+        <antcall target="deploy"/>
+    </target>
+
+    <!-- Deploy project -->
+    <target name="deploy">
+        <antcall target="deploy.project"/>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                     I n i t i a l i z e                     *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Load properties -->
+    <target name="properties.load" unless="properties.loaded">
+        <echo>Loading properties ...</echo>
+        <property file="${BUILD_SHARED_HOME}/etc/build.properties"/>
+        <property file="./build.properties"/>
+        <available file="./build.properties" property="propertyFile.present"/>
+        <property name="properties.loaded" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Safeguard that properties have been loaded -->
+    <target name="properties.loaded" unless="propertyFile.present">
+        <fail>Properties not loaded</fail>
+    </target>
+
+    <!-- Initialize build -->
+    <target name="init" depends="properties.load, properties.loaded" unless="init.completed">
+        <echo>Initializing build ...</echo>
+        <property name="init.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                          B u i l d                          *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Prepare to build project -->
+    <target name="build.prepare" depends="init" unless="build.prepare.completed">
+        <echo>Preparing to build project ...</echo>
+        <mkdir dir="${PROJECT_PACKAGE_CLASSES}"/>
+        <property name="build.prepare.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Copy source code to build directory -->
+    <target name="build.copy" depends="build.prepare" unless="build.copy.completed">
+        <echo>Copying source code to build directory ...</echo>
+        <copy todir="${PROJECT_PACKAGE_SRC}">
+            <fileset dir="${PROJECT_SOURCE_SRC}"/>
+        </copy>
+        <property name="build.copy.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Compile source code -->
+    <target name="build.compile" depends="build.copy" unless="build.compile.completed">
+        <echo>Compiling source code ...</echo>
+        <javac
+            srcdir="${PROJECT_PACKAGE_SRC}"
+            destdir="${PROJECT_PACKAGE_CLASSES}"
+            classpath="${PROJECT_CLASSPATH_COMPILE}"
+            debug="on"
+            optimize="on"
+            deprecation="off"
+            failonerror="true"
+            includeantruntime="false"/>
+        <property name="build.compile.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Clean built project -->
+    <target name="build.clean" depends="init">
+        <echo>Cleaning built project ...</echo>
+        <delete dir="${PROJECT_PACKAGE_HOME}"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                        P a c k a g e                        *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Prepare to package project -->
+    <target name="package.prepare" depends="build.compile" unless="package.prepare.completed">
+        <echo>Preparing to package project ...</echo>
+        <mkdir dir="${PROJECT_PACKAGE_ETC}"/>
+        <copy file="${PROJECT_LOG_RESOURCE_SRC}" tofile="${PROJECT_LOG_RESOURCE_PKG}"/>
+        <mkdir dir="${PROJECT_PACKAGE_JAR}"/>
+        <mkdir dir="${PROJECT_PACKAGE_WAR}"/>
+        <mkdir dir="${PROJECT_PACKAGE_WAR_CLASSES}"/>
+        <mkdir dir="${PROJECT_PACKAGE_WAR_LIB}"/>
+        <copy file="${PROJECT_WAR_MANIFEST_SRC}" tofile="${PROJECT_WAR_MANIFEST_PKG}"/>
+        <property name="package.prepare.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Replace embedded package tokens -->
+    <target name="package.replace" depends="package.prepare" unless="package.replace.completed">
+        <echo>Replacing embedded package tokens ...</echo>
+        <replace file="${PROJECT_WAR_MANIFEST_PKG}" token="::placeholder.version::" value="${PROJECT_VERSION}"/>
+        <property name="package.replace.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Package jar files -->
+    <target name="package.jar" depends="package.replace" unless="package.jar.completed" >
+        <echo>Packaging jar files ...</echo>
+        <!-- Package resource jar file -->
+        <jar jarfile="${PROJECT_PACKAGE_RESOURCE}">
+            <fileset dir="${PROJECT_PACKAGE_ETC}"/>
+            <fileset dir="${SOURCE_SHARED_HOME}/etc">
+                <patternset id="classes.service.deployment">
+                    <include name="**/deployment_*.properties"/>
+                </patternset>
+            </fileset>
+            <fileset dir="${PROJECT_SOURCE_ETC}">
+                <patternset id="classes.service.properties">
+                    <exclude name="**/test.properties"/>
+                    <include name="**/service.properties"/>
+                    <include name="**/local.properties"/>
+                </patternset>
+            </fileset>
+            <fileset file="${SOURCE_SERVER_HOME}/etc/server.properties"/>
+        </jar>
+        <property name="package.jar.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Package war file -->
+    <target name="package.war" depends="package.jar" unless="package.war.completed">
+        <echo>Packaging war file ...</echo>
+        <!-- Descriptors -->
+        <copy file="${PROJECT_WAR_WEB_SRC}" tofile="${PROJECT_WAR_WEB_PKG}"/>
+        <copy file="${PROJECT_WAR_WEBLOGIC_SRC}" tofile="${PROJECT_WAR_WEBLOGIC_PKG}"/>
+        <!-- Classes -->
+        <copy todir="${PROJECT_PACKAGE_WAR_CLASSES}">
+            <fileset dir="${PROJECT_PACKAGE_CLASSES}"/>
+        </copy>
+        <!-- Libraries -->
+        <copy todir="${PROJECT_PACKAGE_WAR_LIB}">
+            <fileset file="${CIS_JAR_COMMON}"/>
+            <fileset file="${PROJECT_JAR_COMMON_DPY}"/>
+            <fileset file="${PROJECT_JAR_SERVER_DPY}"/>
+            <fileset dir="${PROJECT_PACKAGE_JAR}"/>
+        </copy>
+        <copy todir="${PROJECT_PACKAGE_WAR_LIB}">
+            <fileset dir="${SOURCE_SHARED_HOME}/lib">
+                <patternset id="jars.service">
+                    <exclude name="**/slf4j-simple-*.jar"/>
+                    <exclude name="**/eit-*.jar"/>
+                    <exclude name="**/spring-test-*.jar"/>
+                </patternset>
+            </fileset>
+        </copy>
+        <war destfile="${PROJECT_PACKAGE_RELEASE}" webxml="${PROJECT_WAR_WEB_PKG}" manifest="${PROJECT_WAR_MANIFEST_PKG}">
+            <webinf file="${PROJECT_WAR_WEBLOGIC_PKG}"/>
+            <classes dir="${PROJECT_PACKAGE_WAR_CLASSES}"/>
+            <lib dir="${PROJECT_PACKAGE_WAR_LIB}"/>
+			<fileset dir="${PROJECT_SOURCE_WEB}"/>
+        </war>
+        <property name="package.war.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Package project -->
+    <target name="package.project" depends="package.war" unless="package.project.completed" >
+        <echo>Packaging project ...</echo>
+        <property name="package.project.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                         D e p l o y                         *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Prepare to deploy project -->
+    <target name="deploy.prepare" depends="init" unless="deploy.prepare.completed">
+        <echo>Preparing to deploy project ...</echo>
+        <mkdir dir="${PROJECT_DEPLOY_HOME}"/>
+        <property name="deploy.prepare.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Deploy project -->
+    <target name="deploy.project" depends="deploy.prepare" unless="deploy.project.completed">
+        <echo>Deploying project ...</echo>
+        <copy file="${PROJECT_PACKAGE_RELEASE}" todir="${PROJECT_DEPLOY_HOME}"/>
+        <property name="deploy.project.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Clean deployed project -->
+    <target name="deploy.clean" depends="init">
+        <echo>Cleaning deployed project ...</echo>
+        <delete dir="${PROJECT_DEPLOY_HOME}"/>
+        <echo>Done</echo>
+    </target>
+
+</project>
