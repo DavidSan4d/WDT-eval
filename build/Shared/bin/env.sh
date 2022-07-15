@@ -1,0 +1,2 @@
+export JAVA_HOME=@@JAVA_HOME@@
+export WEBLOGIC_HOME=@@WEBLOGIC_HOME@@
