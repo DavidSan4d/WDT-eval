@@ -35,9 +35,7 @@ By default, the Jenkins build VM supports (***and recommends***) Maven and Gradl
 However, it can support other build tools such as Ant, as long as the project includes the tool with all dependencies in the source.
 In fact, this project does exactly that.
 
-> **Note**
->
-> The Docker build VM image is located [here](https://gitlab.prod.fedex.com/APP3535985/dockerized-builds/-/tree/master/wls-12.2.1.4).
+
 
 ### Package
 
