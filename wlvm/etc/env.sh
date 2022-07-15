@@ -1,4 +1,4 @@
-! /bin/sh
+#! /bin/sh
 
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-ibm-1.8.0.6.10-1jpp.1.el7.x86_64
 export ORACLE_HOME=/opt/weblogic/wl12214_201020
