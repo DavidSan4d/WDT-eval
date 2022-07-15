@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+
+<project name="MtpTar" default="refresh" basedir=".">
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                           M a i n                           *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Rebuild and redeploy project -->
+    <target name="refresh">
+        <antcall target="rebuild"/>
+        <antcall target="redeploy"/>
+    </target>
+
+    <!-- Rebuild project -->
+    <target name="rebuild">
+        <antcall target="build.clean"/>
+        <antcall target="build"/>
+    </target>
+
+    <!-- Build project -->
+    <target name="build">
+        <antcall target="package.project"/>
+    </target>
+
+    <!-- Redeploy project -->
+    <target name="redeploy">
+        <antcall target="deploy.clean"/>
+        <antcall target="deploy"/>
+    </target>
+
+    <!-- Deploy project -->
+    <target name="deploy">
+        <antcall target="deploy.project"/>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                     I n i t i a l i z e                     *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Load properties -->
+    <target name="properties.load" unless="properties.loaded">
+        <echo>Loading properties ...</echo>
+        <property file="${BUILD_SHARED_HOME}/etc/build.properties"/>
+        <property file="./build.properties"/>
+        <available file="./build.properties" property="propertyFile.present"/>
+        <property name="properties.loaded" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Safeguard that properties have been loaded -->
+    <target name="properties.loaded" unless="propertyFile.present">
+        <fail>Properties not loaded</fail>
+    </target>
+
+    <!-- Initialize build -->
+    <target name="init" depends="properties.load, properties.loaded" unless="init.completed">
+        <echo>Initializing build ...</echo>
+        <property name="init.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                          B u i l d                          *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Prepare to build project -->
+    <target name="build.prepare" depends="init" unless="build.prepare.completed">
+        <echo>Preparing to build project ...</echo>
+        <property name="build.prepare.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Build Common project -->
+    <target name="build.project.common" unless="build.project.common.completed">
+        <echo>Preparing to build Common project ...</echo>
+        <exec dir="${BUILD_SHARED_HOME}/bin" executable="${PROJECT_EXECUTABLE}">
+            <arg value="${CIS_ENVIRONMENT}"/>
+            <arg value="COMMON"/>
+        </exec>
+        <property name="build.project.common.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Build Server project -->
+    <target name="build.project.server" unless="build.project.server.completed">
+        <echo>Preparing to build Server project ...</echo>
+        <exec dir="${BUILD_SHARED_HOME}/bin" executable="${PROJECT_EXECUTABLE}">
+            <arg value="${CIS_ENVIRONMENT}"/>
+            <arg value="SERVER"/>
+        </exec>
+        <property name="build.project.server.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Build Service project -->
+    <target name="build.project.service" unless="build.project.service.completed">
+        <echo>Preparing to build Service project ...</echo>
+        <exec dir="${BUILD_SHARED_HOME}/bin" executable="${PROJECT_EXECUTABLE}">
+            <arg value="${CIS_ENVIRONMENT}"/>
+            <arg value="SERVICE"/>
+        </exec>
+        <property name="build.project.service.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Build projects -->
+    <target name="build.project" depends="build.prepare, build.project.common, build.project.server, build.project.service"/>
+
+    <!-- Clean built project -->
+    <target name="build.clean" depends="init">
+        <echo>Cleaning built project ...</echo>
+        <delete dir="${PROJECT_PACKAGE_HOME}"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                        P a c k a g e                        *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Prepare to package project -->
+    <target name="package.prepare" depends="build.project" unless="package.prepare.completed">
+        <echo>Preparing to package project ...</echo>
+
+        <!-- Prepare useful package properties -->
+        <propertyfile file="${PROJECT_TAR_REVISION_BLD}">
+            <entry key="PROJECT_REVISION" type="int" default="0" operation="+"/>
+        </propertyfile>
+        <property file="${PROJECT_TAR_REVISION_BLD}"/>
+        <tstamp>
+            <format property="package.date" pattern="ddMMMyy"/>
+        </tstamp>
+
+        <!-- Prepare package directory -->
+        <mkdir dir="${PROJECT_PACKAGE_TAR}"/>
+        <mkdir dir="${PROJECT_PACKAGE_TAR_RELEASE}"/>
+        <copy todir="${PROJECT_PACKAGE_TAR_RELEASE}">
+            <fileset dir="${DEPLOY_SERVICE_HOME}">
+                <include name="*.war"/>
+            </fileset>
+        </copy>
+
+        <property name="package.prepare.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Package project -->
+    <target name="package.tar" unless="package.tar.completed">
+        <echo>Packaging project ...</echo>
+        <tar destfile="${PROJECT_PACKAGE_HOME}/${PROJECT_NAME}_${PROJECT_VERSION}-${PROJECT_RELEASE}.${package.date}-r${PROJECT_REVISION}.tar">
+            <tarfileset dir="${PROJECT_PACKAGE_TAR}" followsymlinks="false"/>
+        </tar>
+        <property name="package.tar.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Package project -->
+    <target name="package.project" depends="package.prepare, package.tar" unless="package.project.completed">
+        <property name="package.project.completed" value="true"/>
+    </target>
+
+    <!-- ***************************************************************
+         *                                                             *
+         *                         D e p l o y                         *
+         *                                                             *
+         *************************************************************** -->
+
+    <!-- Prepare to deploy project -->
+    <target name="deploy.prepare" depends="init" unless="deploy.prepare.completed">
+        <echo>Preparing to deploy project ...</echo>
+        <mkdir dir="${PROJECT_DEPLOY_HOME}"/>
+        <property name="deploy.prepare.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Deploy project -->
+    <target name="deploy.project" depends="deploy.prepare" unless="deploy.project.completed">
+        <echo>Deploying project ...</echo>
+        <copy todir="${PROJECT_DEPLOY_HOME}">
+            <fileset dir="${PROJECT_PACKAGE_HOME}">
+                <include name="*.tar"/>
+            </fileset>
+        </copy>
+        <property name="deploy.project.completed" value="true"/>
+        <echo>Done</echo>
+    </target>
+
+    <!-- Clean deployed project -->
+    <target name="deploy.clean" depends="init">
+        <echo>Cleaning deployed project ...</echo>
+        <delete dir="${PROJECT_DEPLOY_HOME}"/>
+        <echo>Done</echo>
+    </target>
