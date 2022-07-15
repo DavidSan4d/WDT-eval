@@ -1,0 +1,4 @@
+build/Mtp/etc/revision.properties
+build/package
+build/deploy
+wlvm/package
