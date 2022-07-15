@@ -24,8 +24,8 @@ pipeline {
   environment {
 
     CF_PAM_ID = "1900001"
-    EAI_NUMBER = "3536567"
-    EAI_NAME = "IaaSAsCode"
+    EAI_NUMBER = "3538245"
+    EAI_NAME = "WLAutoDeploy"
     GIT_BRANCH = "${env.BRANCH_NAME}"
 
     SSH_OPTIONS='-oStrictHostKeyChecking=no -oBatchMode=yes -oLogLevel=error -oUserKnownHostsFile=/dev/null'
@@ -62,44 +62,44 @@ pipeline {
 
           switch(env.ENVIRONMENT) {
             case 'Lab (Manual)':
-              env.WLVM_TARGET_SERVERS='vm19741.lab.pa.fedex.com,vm19742.lab.pa.fedex.com'
-              env.WLVM_TARGET_JRE='/opt/java/hotspot/8/64_bit/jdk1.8.0_281'
-              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_201020'
+              env.WLVM_TARGET_SERVERS='u0011359.test.cloud.fedex.com,u0011360.test.cloud.fedex.com,u0011361.test.cloud.fedex.com'
+              env.WLVM_TARGET_JRE='/opt/java/hotspot/8/64_bit/jdk1.8.0_331'
+              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_220419'
               env.WLVM_TARGET_WLS="${WLVM_TARGET_ORACLE}/wlserver"
               env.WLVM_TARGET_OPT='/opt/fedex/wlkube/wlvm'
               env.WLVM_TARGET_VAR='/var/fedex/wlkube/wlvm'
               env.WLVM_TARGET_LOG="${WLVM_TARGET_VAR}/log"
               env.WLVM_TARGET_TMP='/tmp/wlvm'
-              env.WLVM_SSH_AGENT='WLVM-POC'
-              env.WLVM_SSH_USER='mc474768'
+              env.WLVM_SSH_AGENT='WDTeval'
+              env.WLVM_SSH_USER='f262337'
               env.WLVM_SERVER_MANAGED_PORT=8001
               env.WLVM_TARGET='L1'
               break
             case 'CloudOps (Automated/EDC)':
-              env.WLVM_TARGET_SERVERS='c0032643.test.cloud.fedex.com,c0032644.test.cloud.fedex.com'
+              env.WLVM_TARGET_SERVERS='u0011359.test.cloud.fedex.com,u0011360.test.cloud.fedex.com,u0011361.test.cloud.fedex.com'
               env.WLVM_TARGET_JRE='/opt/java/hotspot/8/latest'
-              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_210119'
+              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_220419'
               env.WLVM_TARGET_WLS="${WLVM_TARGET_ORACLE}/wlserver"
-              env.WLVM_TARGET_OPT='/opt/fedex/iaasascode/wlvm/deploy'
-              env.WLVM_TARGET_VAR='/var/fedex/iaasascode/wlvm/deploy'
+              env.WLVM_TARGET_OPT='/opt/fedex/wltest/wlvm/deploy'
+              env.WLVM_TARGET_VAR='/var/fedex/wltest/wlvm/deploy'
               env.WLVM_TARGET_LOG="${WLVM_TARGET_VAR}/log"
               env.WLVM_TARGET_TMP="${WLVM_TARGET_VAR}/tmp"
               env.WLVM_SSH_AGENT='WLVM-POC'
-              env.WLVM_SSH_USER='mc474768'
+              env.WLVM_SSH_USER='wltest'
               env.WLVM_SERVER_MANAGED_PORT=8001
               env.WLVM_TARGET='L1'
               break 
             case 'CloudOps (Automated/CLW)':
-              env.WLVM_TARGET_SERVERS='wlvm-colo-01.test.cloud.fedex.com,wlvm-colo-02.test.cloud.fedex.com,wlvm-colo-03.test.cloud.fedex.com'
+              env.WLVM_TARGET_SERVERS='u0011359.test.cloud.fedex.com,u0011360.test.cloud.fedex.com,u0011361.test.cloud.fedex.com'
               env.WLVM_TARGET_JRE='/opt/java/hotspot/8/latest'
-              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_210119'
+              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_220419'
               env.WLVM_TARGET_WLS="${WLVM_TARGET_ORACLE}/wlserver"
-              env.WLVM_TARGET_OPT='/opt/fedex/iaasascode/wlvm'
-              env.WLVM_TARGET_VAR='/var/fedex/iaasascode/wlvm'
+              env.WLVM_TARGET_OPT='/opt/fedex/wltest/wlvm'
+              env.WLVM_TARGET_VAR='/var/fedex/wltest/wlvm'
               env.WLVM_TARGET_LOG="${WLVM_TARGET_VAR}/log"
               env.WLVM_TARGET_TMP="${WLVM_TARGET_VAR}/tmp"
-              env.WLVM_SSH_AGENT='hermes-keyper_3536567_devtest_iaasascode'
-              env.WLVM_SSH_USER='iaasascode'
+              env.WLVM_SSH_AGENT='WDTeval'
+              env.WLVM_SSH_USER='wltest'
               env.WLVM_TF_WORKSPACE='colo'
               env.WLVM_SERVER_MANAGED_PORT=8001
               env.WLVM_TARGET='L1'
