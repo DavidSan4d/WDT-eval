@@ -70,7 +70,7 @@ pipeline {
               env.WLVM_TARGET_VAR='/var/fedex/wlkube/wlvm'
               env.WLVM_TARGET_LOG="${WLVM_TARGET_VAR}/log"
               env.WLVM_TARGET_TMP='/tmp/wlvm'
-              env.WLVM_SSH_AGENT='WDTeval'
+              env.WLVM_SSH_AGENT='wltest'
               env.WLVM_SSH_USER='f262337'
               env.WLVM_SERVER_MANAGED_PORT=8001
               env.WLVM_TARGET='L1'
@@ -84,7 +84,7 @@ pipeline {
               env.WLVM_TARGET_VAR='/var/fedex/wltest/wlvm/deploy'
               env.WLVM_TARGET_LOG="${WLVM_TARGET_VAR}/log"
               env.WLVM_TARGET_TMP="${WLVM_TARGET_VAR}/tmp"
-              env.WLVM_SSH_AGENT='WLVM-POC'
+              env.WLVM_SSH_AGENT='wltest'
               env.WLVM_SSH_USER='wltest'
               env.WLVM_SERVER_MANAGED_PORT=8001
               env.WLVM_TARGET='L1'
@@ -98,7 +98,7 @@ pipeline {
               env.WLVM_TARGET_VAR='/var/fedex/wltest/wlvm'
               env.WLVM_TARGET_LOG="${WLVM_TARGET_VAR}/log"
               env.WLVM_TARGET_TMP="${WLVM_TARGET_VAR}/tmp"
-              env.WLVM_SSH_AGENT='WDTeval'
+              env.WLVM_SSH_AGENT='wltest'
               env.WLVM_SSH_USER='wltest'
               env.WLVM_TF_WORKSPACE='colo'
               env.WLVM_SERVER_MANAGED_PORT=8001
@@ -133,10 +133,10 @@ pipeline {
           env.WLVM_DOMAIN_NAME='L1CisDomain'
           env.WLVM_DOMAIN_HOME="${WLVM_DOMAIN_PARENT}/${WLVM_DOMAIN_NAME}"
           env.WLVM_DOMAIN_PRODUCTION=false
-          env.WLVM_DOMAIN_TARGET='CisCluster'
-          env.WLVM_SERVER_ADMIN_NAME='CisAdminServer'
+          env.WLVM_DOMAIN_TARGET='WDTCluster'
+          env.WLVM_SERVER_ADMIN_NAME='WDTAdminServer'
           env.WLVM_SERVER_ADMIN_PORT=7001
-          env.WLVM_SERVER_MANAGED_PREFIX='CisManagedServer'
+          env.WLVM_SERVER_MANAGED_PREFIX='WDTManagedServer'
           // WLVM_SERVER_MANAGED_PORT=8001 // unique to each environment
           env.WLVM_SERVER_LOG=false
           env.WLVM_SERVER_APPD=false
