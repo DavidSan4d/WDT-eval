@@ -5,7 +5,7 @@
 myservers=(`echo ${WLVM_TARGET_SERVERS} | tr ',' ' '`)
 myadminserver=${myservers[0]}
 myclustersize=${#myservers[@]}
-myresourcetarget='CisAdminServer'
+myresourcetarget='WDTAdminServer'
 if [ ${myclustersize} -gt 1 ]; then myresourcetarget='CisCluster'; fi
 
 # Package initialization
