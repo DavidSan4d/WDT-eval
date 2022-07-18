@@ -1,7 +1,7 @@
 #! /bin/sh
 
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0-ibm-1.8.0.6.10-1jpp.1.el7.x86_64
-export ORACLE_HOME=/opt/weblogic/wl12214_201020
+export JAVA_HOME=/opt/java/hotspot/8/64_bit/jdk1.8.0_331
+export ORACLE_HOME=/opt/weblogic/wl12214_220419
 export WL_HOME=${ORACLE_HOME}/wlserver
 
 export WLVM_ROOT=${HOME}/wlvm-audit
@@ -12,8 +12,8 @@ export WLVM_PACKAGE_SECRET_WDT=mysupersecret
 export WLVM_PACKAGE_SECRET_WLST=${WLVM_HOME}/etc/c2sSecretWlstCisDomain
 export WLVM_TARGET=L1
 #export WLVM_TARGET_SERVERS=vm19741.lab.pa.fedex.com,vm19742.lab.pa.fedex.com
-#export WLVM_TARGET_SERVERS=u0011359.test.cloud.fedex.com,u0011360.test.cloud.fedex.com,u0011361.test.cloud.fedex.com
-export WLVM_TARGET_JRE=/opt/java/hotspot/8/64_bit/jdk1.8.0_281
+export WLVM_TARGET_SERVERS=u0011359.test.cloud.fedex.com,u0011360.test.cloud.fedex.com,u0011361.test.cloud.fedex.com
+export WLVM_TARGET_JRE=/opt/java/hotspot/8/64_bit/jdk1.8.0_331
 export WLVM_TARGET_ORACLE=/opt/weblogic/wl12214_220419
 export WLVM_TARGET_WLS=${WLVM_TARGET_ORACLE}/wlserver
 export WLVM_TARGET_OPT=/opt/fedex/wltest/wlvm
