@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "app3536567"
+    bucket = "app3538245"
     key = "terraform.tfstate"
     region = "us-east-1"
     skip_credentials_validation = true
@@ -22,7 +22,7 @@ provider "cloudops" {
 
 resource "cloudops_deployment" "my-deployment" {
   name = var.name
-  eai  = "3536567"
+  eai  = "3538245"
   runtime_classification {
     type      = var.type
     locations = var.locations
