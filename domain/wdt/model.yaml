@@ -7,115 +7,167 @@ domainInfo:
       - wlsdeploy/domainBin/start.sh
       - wlsdeploy/domainBin/stop.sh
 topology:
-    Name: '@@ENV:DOMAIN_NAME@@'
-    DomainVersion: 12.1.3.0.0
-    AdminServerName: CisAdminServer
+    Name: sample-domain
+    AdministrationPortEnabled: true
+    DomainVersion: 12.2.1.4.0
+    ProductionModeEnabled: true
+    AdministrationPort: 9001
+    Log:
+        RotationTime: '10:35'
+        FileMinSize: 2048
+        FileTimeSpan: 12
+        DomainLogBroadcasterBufferSize: 1
+        FileName: /var/fedex/weblogic/logs/sample-domain/sample-domain.log
+    NMProperties:
+        JavaHome: /opt/java/hotspot/8/64_bit/jdk1.8.0_331
+        weblogic.StartScriptName: startWebLogic.sh
     Cluster:
-        'CisCluster':
-            DynamicServers:
-                ServerTemplate:  'cluster-1-template'
-                ServerNamePrefix: 'CisManagedServer'
-                DynamicClusterSize: '@@PROP:CLUSTER_SIZE@@'
-                MaxDynamicClusterSize: '@@PROP:CLUSTER_SIZE@@'
-                MinDynamicClusterSize: '0'
-                CalculatedListenPorts: false
+        sample-appCluster:
+            MessageOrderingEnabled: false
+            WeblogicPluginEnabled: true
     Server:
-        CisAdminServer:
-            ListenPort: '@@ENV:DOMAIN_ADMIN_PORT@@'
-    ServerTemplate:
-        'cluster-1-template':
-            Cluster: 'CisCluster'
-            ListenPort: '@@ENV:DOMAIN_MANAGED_PORT@@'
-resources:
-    JDBCSystemResource:
-        L1 CIS JDBC Data Source:
-            Target: '@@PROP:RESOURCE_TARGET@@'
-            JdbcResource:
-                JDBCConnectionPoolParams:
-                    TestTableName: SQL SELECT 1 FROM DUAL
-                    TestConnectionsOnReserve: true
-                JDBCDataSourceParams:
-                    GlobalTransactionsProtocol: EmulateTwoPhaseCommit
-                    JNDIName: 'L1CisJdbcDataSource,L1JdbcDataSource'
-                JDBCDriverParams:
-                    URL: 'jdbc:oracle:thin:@ldap://oid.inf.fedex.com:3060/CISERVICES_SVC1_L1,cn=OracleContext'
-                    PasswordEncrypted: '@@PROP:JDBC.L1-CIS-JDBC-Data-Source.PasswordEncrypted@@'
-                    DriverName: oracle.jdbc.OracleDriver
-                    Properties:
-                        user:
-                            Value: '@@PROP:JDBC.L1-CIS-JDBC-Data-Source.user.Value@@'
-    MailSession:
-        Cis Mail Session:
-            Properties:
-                mail.transport.protocol: smtp
-                mail.host: mapper.gslb.fedex.com
-            Target: '@@PROP:RESOURCE_TARGET@@'
-            JNDIName: CisMailSession
-    JMSSystemResource:
-        CIS JMS System Module:
-            Target: '@@PROP:RESOURCE_TARGET@@'
-            SubDeployment:
-                L1 EIT Subdeployment:
-                    Target: '@@PROP:RESOURCE_TARGET@@'
-            JmsResource:
-                ForeignServer:
-                    L1 EIT Foreign Server:
-                        SubDeploymentName: L1 EIT Subdeployment
-                        ConnectionURL: 'ldap://apptstldap.corp.fedex.com:389/ou=messaging,dc=corp,dc=fedex,dc=com'
-                        InitialContextFactory: com.fedex.mi.decorator.jms.FedexTibcoInitialContext
-                        ForeignConnectionFactory:
-                            L1 Services Queue Consumer EIT Foreign Connection Factory:
-                                RemoteJndiName: 'fxClientUID=S.6949.CISEVENT.SERVICES-6949.WTC.QCF.L1.01'
-                                Username: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Services-Queue-Consumer-EIT-Foreign-Connection-Factory.Username@@'
-                                LocalJNDIName: ServicesQueueConsumerEitForeignConnectionFactory
-                                PasswordEncrypted: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Services-Queue-Consumer-EIT-Foreign-Connection-Factory.PasswordEncrypted@@'
-                            L1 Services Topic Consumer EIT Foreign Connection Factory:
-                                RemoteJndiName: 'fxClientUID=S.6949.CISSERVICES.SERVICES.WTC.TCF.L1.01'
-                                Username: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Services-Topic-Consumer-EIT-Foreign-Connection-Factory.Username@@'
-                                LocalJNDIName: ServicesTopicConsumerEitForeignConnectionFactory
-                                PasswordEncrypted: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Services-Topic-Consumer-EIT-Foreign-Connection-Factory.PasswordEncrypted@@'
-                            L1 Business Queue Consumer EIT Foreign Connection Factory:
-                                RemoteJndiName: 'fxClientUID=S.6949.CISEVENT.BUSINESS-6949.WTC.QCF.L1.01'
-                                Username: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Business-Queue-Consumer-EIT-Foreign-Connection-Factory.Username@@'
-                                LocalJNDIName: BusinessQueueConsumerEitForeignConnectionFactory
-                                PasswordEncrypted: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Business-Queue-Consumer-EIT-Foreign-Connection-Factory.PasswordEncrypted@@'
-                            L1 Business Topic Consumer EIT Foreign Connection Factory:
-                                RemoteJndiName: 'fxClientUID=S.6949.CISSERVICES.BUSINESS.WTC.TCF.L1.01'
-                                Username: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Business-Topic-Consumer-EIT-Foreign-Connection-Factory.Username@@'
-                                LocalJNDIName: BusinessTopicConsumerEitForeignConnectionFactory
-                                PasswordEncrypted: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Business-Topic-Consumer-EIT-Foreign-Connection-Factory.PasswordEncrypted@@'
-                            L1 Gateway Queue Consumer EIT Foreign Connection Factory:
-                                RemoteJndiName: 'fxClientUID=S.6949.CISEVENT.GATEWAY-6949.WTC.QCF.L1.01'
-                                Username: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Gateway-Queue-Consumer-EIT-Foreign-Connection-Factory.Username@@'
-                                LocalJNDIName: GatewayQueueConsumerEitForeignConnectionFactory
-                                PasswordEncrypted: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Gateway-Queue-Consumer-EIT-Foreign-Connection-Factory.PasswordEncrypted@@'
-                            L1 Gateway Topic Consumer EIT Foreign Connection Factory:
-                                RemoteJndiName: 'fxClientUID=S.6949.CISSERVICES.GATEWAY.WTC.TCF.L1.01'
-                                Username: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Gateway-Topic-Consumer-EIT-Foreign-Connection-Factory.Username@@'
-                                LocalJNDIName: GatewayTopicConsumerEitForeignConnectionFactory
-                                PasswordEncrypted: '@@PROP:JMS.CIS-JMS-System-Module.L1-EIT-Foreign-Server.L1-Gateway-Topic-Consumer-EIT-Foreign-Connection-Factory.PasswordEncrypted@@'
-                        ForeignDestination:
-                            L1 Services Queue Consumer EIT Foreign Destination:
-                                RemoteJndiName: 'fxClientDestinationUID=D.FXCONVEY.AIR.CISEVENT.SERVICES-6949'
-                                LocalJNDIName: ServicesQueueConsumerEitForeignDestination
-                            L1 Services Topic Consumer EIT Foreign Destination:
-                                RemoteJndiName: 'fxClientDestinationUID=D.FDSVIPC.CISSERVICES.SERVICES'
-                                LocalJNDIName: ServicesTopicConsumerEitForeignDestination
-                            L1 Business Queue Consumer EIT Foreign Destination:
-                                RemoteJndiName: 'fxClientDestinationUID=D.FXCONVEY.AIR.CISEVENT.BUSINESS-6949'
-                                LocalJNDIName: BusinessQueueConsumerEitForeignDestination
-                            L1 Business Topic Consumer EIT Foreign Destination:
-                                RemoteJndiName: 'fxClientDestinationUID=D.FDSVIPC.CISSERVICES.BUSINESS'
-                                LocalJNDIName: BusinessTopicConsumerEitForeignDestination
-                            L1 Gateway Queue Consumer EIT Foreign Destination:
-                                RemoteJndiName: 'fxClientDestinationUID=D.FXCONVEY.AIR.CISEVENT.GATEWAY-6949'
-                                LocalJNDIName: GatewayQueueConsumerEitForeignDestination
-                            L1 Gateway Topic Consumer EIT Foreign Destination:
-                                RemoteJndiName: 'fxClientDestinationUID=D.FDSVIPC.CISSERVICES.GATEWAY'
-                                LocalJNDIName: GatewayTopicConsumerEitForeignDestination
+        AdminServer:
+            ListenPort: 10001
+            CustomIdentityKeyStoreFileName: wlsdeploy/servers/AdminServer/FedEx_Weblogic_Admin_Console_InfosecCA.jks
+            KeyStores: CustomIdentityAndCustomTrust
+            CustomIdentityKeyStoreType: JKS
+            CustomTrustKeyStoreFileName: wlsdeploy/servers/AdminServer/cacerts
+            CustomTrustKeyStoreType: JKS
+            CustomIdentityKeyStorePassPhraseEncrypted: '@@PROP:Server.AdminServer.CustomIdentityKeyStorePassPhraseEncrypted@@'
+            CustomTrustKeyStorePassPhraseEncrypted: '@@PROP:Server.AdminServer.CustomTrustKeyStorePassPhraseEncrypted@@'
+            ListenAddress: u0011359.test.cloud.fedex.com
+            Log:
+                RotationTime: '10:35'
+                FileMinSize: 2048
+                FileTimeSpan: 12
+                FileName: /var/fedex/weblogic/logs/sample-domain/AdminServer.log
+            SSL:
+                HostnameVerificationIgnored: true
+                ServerPrivateKeyPassPhraseEncrypted: '@@PROP:Server.AdminServer.SSL.ServerPrivateKeyPassPhraseEncrypted@@'
+                ServerPrivateKeyAlias: fedex_weblogic_admin_console
+        sample-app_u0011359:
+            ListenPort: 10001
+            WeblogicPluginEnabled: true
+            CustomIdentityKeyStoreFileName: wlsdeploy/servers/sample-app_u0011359/FedEx_Weblogic_Admin_Console_InfosecCA.jks
+            Machine: u0011359.test.cloud.fedex.com
+            KeyStores: CustomIdentityAndCustomTrust
+            StagingMode: nostage
+            CustomIdentityKeyStoreType: JKS
+            CustomTrustKeyStoreFileName: wlsdeploy/servers/sample-app_u0011359/cacerts
+            AdministrationPort: 10003
+            CustomTrustKeyStoreType: JKS
+            StagingDirectoryName: /opt/fedex/sample
+            Cluster: sample-appCluster
+            CustomIdentityKeyStorePassPhraseEncrypted: '@@PROP:Server.sample-app_u0011359.CustomIdentityKeyStorePassPhraseEncrypted@@'
+            CustomTrustKeyStorePassPhraseEncrypted: '@@PROP:Server.sample-app_u0011359.CustomTrustKeyStorePassPhraseEncrypted@@'
+            ListenAddress: u0011359.test.cloud.fedex.com
+            JTAMigratableTarget:
+                Cluster: sample-appCluster
+                UserPreferredServer: sample-app_u0011359
+            Log:
+                FileCount: 15
+                FileMinSize: 2048
+                FileName: /var/fedex/wltest/logs/weblogic/sample-app_u0011359.log
+            SSL:
+                HostnameVerificationIgnored: true
+                ServerPrivateKeyPassPhraseEncrypted: '@@PROP:Server.sample-app_u0011359.SSL.ServerPrivateKeyPassPhraseEncrypted@@'
+                ServerPrivateKeyAlias: fedex_weblogic_admin_console
+            WebServer:
+                WebServerLog:
+                    FileMinSize: 2048
+                    FileName: /var/fedex/wltest/logs/weblogic/access.log
+        sample-app_u0011360:
+            ListenPort: 10001
+            WeblogicPluginEnabled: true
+            CustomIdentityKeyStoreFileName: wlsdeploy/servers/sample-app_u0011360/FedEx_Weblogic_Admin_Console_InfosecCA.jks
+            Machine: u0011360.test.cloud.fedex.com
+            KeyStores: CustomIdentityAndCustomTrust
+            StagingMode: nostage
+            CustomIdentityKeyStoreType: JKS
+            CustomTrustKeyStoreFileName: wlsdeploy/servers/sample-app_u0011360/cacerts
+            AdministrationPort: 10003
+            CustomTrustKeyStoreType: JKS
+            StagingDirectoryName: /opt/fedex/sample
+            Cluster: sample-appCluster
+            CustomIdentityKeyStorePassPhraseEncrypted: '@@PROP:Server.sample-app_u0011360.CustomIdentityKeyStorePassPhraseEncrypted@@'
+            CustomTrustKeyStorePassPhraseEncrypted: '@@PROP:Server.sample-app_u0011360.CustomTrustKeyStorePassPhraseEncrypted@@'
+            ListenAddress: u0011360.test.cloud.fedex.com
+            JTAMigratableTarget:
+                Cluster: sample-appCluster
+                UserPreferredServer: sample-app_u0011360
+            Log:
+                FileCount: 15
+                FileMinSize: 2048
+                FileName: /var/fedex/wltest/logs/weblogic/sample-app_u0011360.log
+            SSL:
+                HostnameVerificationIgnored: true
+                ServerPrivateKeyPassPhraseEncrypted: '@@PROP:Server.sample-app_u0011360.SSL.ServerPrivateKeyPassPhraseEncrypted@@'
+                ServerPrivateKeyAlias: fedex_weblogic_admin_console
+            WebServer:
+                WebServerLog:
+                    FileMinSize: 2048
+                    FileName: /var/fedex/wltest/logs/weblogic/access.log
+        sample-app_u0011361:
+            ListenPort: 10001
+            WeblogicPluginEnabled: true
+            CustomIdentityKeyStoreFileName: wlsdeploy/servers/sample-app_u0011361/FedEx_Weblogic_Admin_Console_InfosecCA.jks
+            Machine: u0011361.test.cloud.fedex.com
+            KeyStores: CustomIdentityAndCustomTrust
+            StagingMode: nostage
+            CustomIdentityKeyStoreType: JKS
+            CustomTrustKeyStoreFileName: wlsdeploy/servers/sample-app_u0011361/cacerts
+            AdministrationPort: 10003
+            CustomTrustKeyStoreType: JKS
+            StagingDirectoryName: /opt/fedex/sample
+            Cluster: sample-appCluster
+            CustomIdentityKeyStorePassPhraseEncrypted: '@@PROP:Server.sample-app_u0011361.CustomIdentityKeyStorePassPhraseEncrypted@@'
+            CustomTrustKeyStorePassPhraseEncrypted: '@@PROP:Server.sample-app_u0011361.CustomTrustKeyStorePassPhraseEncrypted@@'
+            ListenAddress: u0011361.test.cloud.fedex.com
+            JTAMigratableTarget:
+                Cluster: sample-appCluster
+                UserPreferredServer: sample-app_u0011361
+            Log:
+                FileCount: 15
+                FileMinSize: 2048
+                FileName: /var/fedex/wltest/logs/weblogic/sample-app_u0011361.log
+            SSL:
+                HostnameVerificationIgnored: true
+                ServerPrivateKeyPassPhraseEncrypted: '@@PROP:Server.sample-app_u0011361.SSL.ServerPrivateKeyPassPhraseEncrypted@@'
+                ServerPrivateKeyAlias: fedex_weblogic_admin_console
+            WebServer:
+                WebServerLog:
+                    FileMinSize: 2048
+                    FileName: /var/fedex/wltest/logs/weblogic/access.log
+    MigratableTarget:
+        sample-app_u0011359 (migratable):
+            Cluster: sample-appCluster
+            UserPreferredServer: sample-app_u0011359
+            Notes: This is a system generated default migratable target for a server.
+                Do not delete manually.
+        sample-app_u0011360 (migratable):
+            Cluster: sample-appCluster
+            UserPreferredServer: sample-app_u0011360
+            Notes: This is a system generated default migratable target for a server.
+                Do not delete manually.
+        sample-app_u0011361 (migratable):
+            Cluster: sample-appCluster
+            UserPreferredServer: sample-app_u0011361
+            Notes: This is a system generated default migratable target for a server.
+                Do not delete manually.
+    Machine:
+        u0011359.test.cloud.fedex.com: {}
+        u0011360.test.cloud.fedex.com: {}
+        u0011361.test.cloud.fedex.com: {}
+    SecurityConfiguration:
+        NodeManagerPasswordEncrypted: '@@PROP:SecurityConfig.NodeManagerPasswordEncrypted@@'
+        NodeManagerUsername: '@@PROP:SecurityConfig.NodeManagerUsername@@'
+        Realm:
+            myrealm:
+                CertPathBuilder: WebLogicCertPathProvider
+
 appDeployments:
     Application:
         'cis-audit#1.2.1':
-            SourcePath: 'wlsdeploy/applications/cis-audit.war'
+            SourcePath: 'wlsdeploy/applications/SampleWebApp.war'
             ModuleType: war
             Target: '@@PROP:RESOURCE_TARGET@@'
