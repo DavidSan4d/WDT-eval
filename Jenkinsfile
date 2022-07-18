@@ -33,8 +33,10 @@ pipeline {
     //
     // CloudOps Provisioning Config
     //
-    OKTA_CREDS=credentials('okta_3536567_devtest')
-    S3_CREDS=credentials('s3_3536567_devtest')
+    //OKTA_CREDS=credentials('okta_3536567_devtest')
+    OKTA_CREDS=credentials('okta_3538245_devtest')
+    //S3_CREDS=credentials('s3_3536567_devtest')
+    S3_CREDS=credentials('s3_3538245_devtest')
     MF_BROKER="mf-broker-prod.app.wtcbo4.paas.fedex.com"
     S3_ENDPOINT="https://swift-bo.swift.ute.fedex.com"
     ISSUER="https://purpleid-stage.oktapreview.com/oauth2/auss1ynuf4k5qzlNA0h7/v1/token?grant_type=client_credentials&response_type=token"
