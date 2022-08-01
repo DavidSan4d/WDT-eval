@@ -80,7 +80,7 @@ pipeline {
             case 'CloudOps (Automated/EDC)':
               env.WLVM_TARGET_SERVERS='u0011359.test.cloud.fedex.com,u0011360.test.cloud.fedex.com,u0011361.test.cloud.fedex.com'
               env.WLVM_TARGET_JRE='/opt/java/hotspot/8/latest'
-              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_220419'
+              env.WLVM_TARGET_ORACLE='/opt/weblogic/wl12214_220719'
               env.WLVM_TARGET_WLS="${WLVM_TARGET_ORACLE}/wlserver"
               env.WLVM_TARGET_OPT='/opt/fedex/wltest/wlvm/deploy'
               env.WLVM_TARGET_VAR='/var/fedex/wltest/wlvm/deploy'
